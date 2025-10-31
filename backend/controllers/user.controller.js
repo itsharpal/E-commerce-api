@@ -1,11 +1,11 @@
 import { User } from "../models/user.model.js";
-import bcrypt from 'bcrypts';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const signUp = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
-        if (!name || !email || !password || !role) {
+        const { name, email, password  } = req.body;
+        if (!name || !email || !password) {
             return res.status(400).json({
                 message: "All fields are required",
                 success: false
@@ -25,8 +25,7 @@ export const signUp = async (req, res) => {
         await User.create({
             name,
             email,
-            password: hashedPassword,
-            role
+            password: hashedPassword
         })
 
         return res.status(201).json({
@@ -76,8 +75,8 @@ export const login = async (req, res) => {
             email
         }
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
-            message: `Welcome back ${user.fullname}`,
+        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'strict' }).json({
+            message: `Welcome back ${user.name}`,
             user,
             success: true
         })
@@ -97,3 +96,4 @@ export const logout = async (req, res) => {
         console.log(error);
     }
 }
+
