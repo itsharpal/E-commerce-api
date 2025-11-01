@@ -28,6 +28,9 @@ export const newProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const productId = req.params.productId;
+        if (!productId) {
+            return res.json("Id not provided")
+        }
         const { name, description, price, stock, category } = req.body;
         const updatedProduct = { name, description, price, stock, category };
 
