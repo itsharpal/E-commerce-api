@@ -7,17 +7,21 @@ export const createCategory = async (req, res) => {
             return res.status(400).json("All fields are required");
         }
 
-        let category = await Category.find({ name, description });
-        if (category) {
+        const existingCategory = await Category.findOne({ name });
+        if (existingCategory) {
             return res.status(400).json("Category already exists");
         }
 
-        category = Category.create({
+        const category = await Category.create({
             name,
             description
         });
 
-        return res.status(400).json({ message: "Category created successfully", category });
+        return res.status(201).json({
+            message: "Category created successfully",
+            success: true,
+            category
+        });
 
     } catch (error) {
         console.log(error);
@@ -43,7 +47,7 @@ export const updateCategory = async (req, res) => {
 
         return res.status(200).json({
             message: "Updated successfuly",
-            product
+            category
         });
     } catch (error) {
         console.log(error);
@@ -64,7 +68,7 @@ export const deleteCategory = async (req, res) => {
 
         return res.status(200).json({
             message: "Deleted following category successfuly",
-            product
+            category
         });
     } catch (error) {
         console.log(error);
