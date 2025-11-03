@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { Cart } from '../models/cart.model.js';
+import { Order } from '../models/order.model.js';
 import dotenv from 'dotenv';
 dotenv.config({});
 
@@ -13,6 +14,15 @@ export const createCheckoutSession = async (req, res) => {
         if (!cart || cart.items.length === 0) {
             return res.status(400).json("Cart is empty");
         }
+
+        const order = await Order.create({
+            user: userId,
+            products: cart.items.map(item => ({
+                product: item.productId._id,
+                quantity: item.quantity
+            })),
+            status: 'pending',
+        });
 
         const lineItems = cart.items.map((item) => ({
             price_data: {
@@ -33,7 +43,7 @@ export const createCheckoutSession = async (req, res) => {
             billing_address_collection: "required",
             success_url: `${process.env.FRONTEND_URL}/success`,
             cancel_url: `${process.env.FRONTEND_URL}/cancel`,
-            metadata: { userId },
+            metadata: { userId, orderId: order._id.toString() },
         });
 
         res.status(200).json({ success: true, url: session.url });
